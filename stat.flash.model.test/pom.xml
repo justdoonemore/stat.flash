@@ -9,7 +9,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 
-	<artifactId>stat.flash.model</artifactId>
+	<artifactId>stat.flash.model.test</artifactId>
 
 	<dependencies>
 		<dependency>
@@ -23,6 +23,31 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>util.log.api</artifactId>
+		</dependency>
+		<!-- Test Dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>util.log.log4j</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>util.database.javasql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

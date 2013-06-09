@@ -16,39 +16,42 @@
  */
 package com.jdom.stat.flash.android;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import java.sql.SQLException;
+
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.jdom.logging.api.LogFactory;
-import com.jdom.logging.api.Logger;
+import com.jdom.database.android.AndroidConnectionWrapper;
+import com.jdom.database.rawsql.ConnectionWrapper;
 import com.jdom.stat.flash.dao.StatFlashDb;
 
 /**
  * @author djohnson
  * 
  */
-public class StatFlashDbHelper extends SQLiteOpenHelper {
+public class AndroidStatFlashDb extends StatFlashDb {
 
-	private final Logger log = LogFactory.getLogger(StatFlashDbHelper.class);
+	private final SQLiteOpenHelper dbHelper;
 
-	public StatFlashDbHelper(Context context) {
-		super(context, StatFlashDb.DATABASE_NAME, null,
-				StatFlashDb.DATABASE_VERSION);
+	public AndroidStatFlashDb(SQLiteOpenHelper dbHelper) {
+		this.dbHelper = dbHelper;
 	}
 
-	@Override
-	public void onCreate(SQLiteDatabase db) {
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.database.rawsql.RawDatabase#getConnection()
+	 */
+	public ConnectionWrapper getConnection() throws SQLException {
+		return new AndroidConnectionWrapper(dbHelper);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.database.rawsql.BaseRawDatabase#startInternal()
+	 */
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO: Do something on upgrade
-	}
-
-	@Override
-	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO: Do something on downgrade
+	protected void startInternal() throws Exception {
 	}
 
 }

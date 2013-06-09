@@ -22,7 +22,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -32,7 +31,7 @@ import org.junit.Test;
 
 import com.jdom.database.api.DaoException;
 import com.jdom.database.api.DatabaseUtil;
-import com.jdom.database.javasql.JavaSqlConnectionWrapper;
+import com.jdom.database.rawsql.ConnectionWrapper;
 import com.jdom.database.rawsql.RawSqlDbStrategy;
 import com.jdom.stat.flash.dao.impl.SqlDecksDao;
 import com.jdom.stat.flash.domain.Deck;
@@ -43,21 +42,23 @@ import com.jdom.stat.flash.domain.Deck;
  */
 public class SqlDecksDaoTest {
 
-	private Connection c;
+	private ConnectionWrapper c;
 
 	private SqlDecksDao dao;
 
+	private final TestSqliteDatabase db = new TestSqliteDatabase();
+
 	@Before
 	public void setUp() throws Exception {
-		c = TestSqliteDatabase.start();
+		db.start();
 
-		dao = new SqlDecksDao(new RawSqlDbStrategy(
-				new JavaSqlConnectionWrapper(c)));
+		c = db.getConnection();
+		dao = new SqlDecksDao(new RawSqlDbStrategy(c));
 	}
 
 	@After
 	public void tearDown() throws SQLException {
-		TestSqliteDatabase.shutdown();
+		db.shutdown();
 	}
 
 	@Test

@@ -16,11 +16,17 @@
  */
 package com.jdom.stat.flash.dao;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import com.jdom.database.rawsql.BaseRawDatabase;
+
 /**
  * @author djohnson
  * 
  */
-public final class StatFlashDb {
+public abstract class StatFlashDb extends BaseRawDatabase {
 
 	// If you change the database schema, you must increment the database
 	// version.
@@ -35,7 +41,36 @@ public final class StatFlashDb {
 			+ DECK_TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY," + DECK_NAME
 			+ " TEXT," + DECK_VERSION + " INTEGER)";
 
-	private StatFlashDb() {
+	protected StatFlashDb() {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.database.api.Database#getSoftwareVersion()
+	 */
+	public long getSoftwareVersion() {
+		return 1;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.database.rawsql.BaseRawDatabase#getSchemaDdl()
+	 */
+	@Override
+	protected List<String> getSchemaDdl() {
+		return Arrays.asList(SQL_CREATE_ENTRIES);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.database.rawsql.BaseRawDatabase#getUpgradeDeltaScripts(long)
+	 */
+	@Override
+	protected List<String> getUpgradeDeltaScripts(long toVersion) {
+		return Collections.emptyList();
 	}
 
 }

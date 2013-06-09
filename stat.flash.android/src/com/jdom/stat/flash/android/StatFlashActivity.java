@@ -45,6 +45,13 @@ public class StatFlashActivity extends Activity {
 		super.onResume();
 
 		dbHelper = new StatFlashDbHelper(getBaseContext());
+		AndroidStatFlashDb db = new AndroidStatFlashDb(dbHelper);
+		try {
+			db.start();
+		} catch (Exception e) {
+			throw new RuntimeException("Unable to start the database!", e);
+		}
+
 		decksModel = new DecksModel(new SqlDecksDao(new RawSqlDbStrategy(
 				new AndroidConnectionWrapper(dbHelper))));
 

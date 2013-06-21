@@ -37,6 +37,10 @@ public class SqlDecksDao implements DecksDao, ResultSetResolver<Deck> {
 			+ StatFlashDb.DECK_TABLE_NAME + " (" + StatFlashDb.DECK_NAME + ", "
 			+ StatFlashDb.DECK_VERSION + ") VALUES (?, ?);";
 
+	private final String deleteSql = "DELETE FROM "
+			+ StatFlashDb.DECK_TABLE_NAME + " WHERE " + StatFlashDb.DECK_NAME
+			+ " = ?;";
+
 	private final String GET_DECKS_SQL = "SELECT * FROM "
 			+ StatFlashDb.DECK_TABLE_NAME;
 
@@ -51,7 +55,7 @@ public class SqlDecksDao implements DecksDao, ResultSetResolver<Deck> {
 	 * 
 	 * @see com.jdom.stat.flash.dao.DecksDao#createDeck(com.jdom.stat.flash.domain.Deck)
 	 */
-	public void createDeck(Deck deck) throws DaoException {
+	public void store(Deck deck) throws DaoException {
 		try {
 			dbStrategy.executeSql(insertSql, deck.getName(), deck.getVersion());
 		} catch (Exception e) {
@@ -60,9 +64,22 @@ public class SqlDecksDao implements DecksDao, ResultSetResolver<Deck> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.database.api.dao.BaseDao#delete(java.lang.Object)
+	 */
+	public void delete(Deck deck) throws DaoException {
+		try {
+			dbStrategy.executeSql(deleteSql, deck.getName());
+		} catch (Exception e) {
+			throw new DaoException(e);
+		}
+	}
+
+	/**
 	 * @return
 	 */
-	public List<Deck> getDecks() throws DaoException {
+	public List<Deck> getAll() throws DaoException {
 		try {
 			return dbStrategy.retrieveSql(GET_DECKS_SQL, this);
 		} catch (Exception e) {
@@ -80,4 +97,5 @@ public class SqlDecksDao implements DecksDao, ResultSetResolver<Deck> {
 		return new Deck(resultSet.getLong(1), resultSet.getString(2),
 				resultSet.getInt(3));
 	}
+
 }

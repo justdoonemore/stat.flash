@@ -18,8 +18,14 @@ package com.jdom.stat.flash.android;
 
 import java.util.List;
 
-import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import com.google.common.collect.Lists;
 import com.jdom.database.android.AndroidConnectionWrapper;
 import com.jdom.database.rawsql.RawSqlDbStrategy;
 import com.jdom.logging.api.LogFactory;
@@ -27,18 +33,31 @@ import com.jdom.logging.api.Logger;
 import com.jdom.stat.flash.dao.impl.SqlDecksDao;
 import com.jdom.stat.flash.domain.Deck;
 import com.jdom.stat.flash.model.DecksModel;
+import com.jdom.stat.flash.view.DecksView;
 
 /**
  * @author djohnson
  * 
  */
-public class StatFlashActivity extends Activity {
+public class StatFlashActivity extends BaseActivity implements DecksView {
+
+	private static final int LIST_ITEM_TYPE = android.R.layout.simple_list_item_1;
 
 	private final Logger log = LogFactory.getLogger(StatFlashActivity.class);
 
 	private StatFlashDbHelper dbHelper;
 
 	private DecksModel decksModel;
+
+	private String selectedDeck;
+
+	private Runnable deckSelectedAction;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.decks);
+	}
 
 	@Override
 	protected void onResume() {
@@ -52,16 +71,59 @@ public class StatFlashActivity extends Activity {
 			throw new RuntimeException("Unable to start the database!", e);
 		}
 
-		decksModel = new DecksModel(new SqlDecksDao(new RawSqlDbStrategy(
-				new AndroidConnectionWrapper(dbHelper))));
+		SqlDecksDao decksDao = new SqlDecksDao(new RawSqlDbStrategy(
+				new AndroidConnectionWrapper(dbHelper)));
+		decksModel = new DecksModel(decksDao, this);
 
-		decksModel.createDeck("deck2");
+		decksModel.createDeck("someDeck");
+		decksModel.createDeck("someDeck2");
+		decksModel.createDeck("anotherDeck");
 
-		List<Deck> decks = decksModel.getDecks();
+		decksModel.init();
+	}
 
-		log.info("Found " + decks.size() + " decks");
+	/**
+	 * @param decks
+	 */
+	public void setDecks(List<Deck> decks) {
+		final ListView listview = (ListView) findViewById(R.id.decksList);
+		final List<String> deckNames = Lists.newArrayList();
 		for (Deck deck : decks) {
-			log.info("Deck: " + deck.getName());
+			deckNames.add(deck.getName());
 		}
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				LIST_ITEM_TYPE, deckNames);
+
+		listview.setAdapter(adapter);
+
+		listview.setOnItemClickListener(new OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				StatFlashActivity.this.selectedDeck = deckNames.get(arg2);
+				deckSelectedAction.run();
+			}
+		});
+
+		adapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.stat.flash.view.DecksView#getSelectedDeck()
+	 */
+	public String getSelectedDeck() {
+		return selectedDeck;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @see com.jdom.stat.flash.view.DecksView#setDeckSelectedAction(java.lang.Runnable)
+	 */
+	public void setDeckSelectedAction(Runnable deckSelectedAction) {
+		this.deckSelectedAction = deckSelectedAction;
 	}
 }

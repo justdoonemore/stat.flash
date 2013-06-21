@@ -24,6 +24,7 @@ import com.jdom.logging.api.LogFactory;
 import com.jdom.logging.api.Logger;
 import com.jdom.stat.flash.dao.DecksDao;
 import com.jdom.stat.flash.domain.Deck;
+import com.jdom.stat.flash.view.DecksView;
 
 /**
  * @author djohnson
@@ -35,8 +36,17 @@ public class DecksModel {
 
 	private final DecksDao decksDao;
 
-	public DecksModel(DecksDao decksDao) {
+	private final DecksView view;
+
+	private final Runnable deckSelectedAction = new Runnable() {
+		public void run() {
+			deckSelected();
+		}
+	};
+
+	public DecksModel(DecksDao decksDao, DecksView view) {
 		this.decksDao = decksDao;
+		this.view = view;
 	}
 
 	/**
@@ -47,7 +57,7 @@ public class DecksModel {
 		Deck deck = new Deck(deckName);
 
 		try {
-			decksDao.createDeck(deck);
+			decksDao.store(deck);
 
 			log.info("Deck [" + deckName + "] created.");
 		} catch (DaoException e) {
@@ -56,14 +66,46 @@ public class DecksModel {
 	}
 
 	/**
+	 * @param string
+	 */
+	public void deleteDeck(String deckName) {
+
+		Deck deck = new Deck(deckName);
+
+		try {
+			decksDao.delete(deck);
+
+			log.info("Deck [" + deckName + "] deleted.");
+		} catch (DaoException e) {
+			log.error("Unable to delete the deck.", e);
+		}
+	}
+
+	/**
 	 * @return
 	 */
 	public List<Deck> getDecks() {
 		try {
-			return decksDao.getDecks();
+			return decksDao.getAll();
 		} catch (DaoException e) {
 			log.error("Unable to retrieve decks.", e);
 			return Collections.emptyList();
 		}
+	}
+
+	/**
+	 * @param selectedDeck
+	 */
+	public void deckSelected() {
+		final String selectedDeck = view.getSelectedDeck();
+		view.showMessage("Deck", "Opening deck " + selectedDeck);
+	}
+
+	/**
+	 * 
+	 */
+	public void init() {
+		view.setDeckSelectedAction(deckSelectedAction);
+		view.setDecks(getDecks());
 	}
 }

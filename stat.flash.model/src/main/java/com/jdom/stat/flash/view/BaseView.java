@@ -14,15 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jdom.stat.flash.dao;
-
-import com.jdom.database.api.dao.BaseDao;
-import com.jdom.stat.flash.domain.Deck;
+package com.jdom.stat.flash.view;
 
 /**
  * @author djohnson
  * 
  */
-public interface DecksDao extends BaseDao<Deck> {
+public interface BaseView {
 
+	void showMessage(String title, String message);
 }

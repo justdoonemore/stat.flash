@@ -14,15 +14,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jdom.stat.flash.dao;
+package com.jdom.stat.flash.android;
 
-import com.jdom.database.api.dao.BaseDao;
-import com.jdom.stat.flash.domain.Deck;
+import android.app.Activity;
+import android.app.AlertDialog;
+
+import com.jdom.stat.flash.view.BaseView;
 
 /**
  * @author djohnson
  * 
  */
-public interface DecksDao extends BaseDao<Deck> {
+public class BaseActivity extends Activity implements BaseView {
+
+	public void showMessage(String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(title).setMessage(message);
+
+		AlertDialog dialog = builder.create();
+		dialog.show();
+	}
 
 }

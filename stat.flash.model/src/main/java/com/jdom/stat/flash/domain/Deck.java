@@ -16,6 +16,9 @@
  */
 package com.jdom.stat.flash.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.jdom.database.api.DatabaseUtil;
 
 /**
@@ -58,4 +61,24 @@ public class Deck {
 		this.id = id;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Deck) {
+			Deck other = (Deck) obj;
+
+			EqualsBuilder builder = new EqualsBuilder();
+			builder.append(this.name, other.name);
+			builder.append(this.version, other.version);
+			return builder.isEquals();
+		}
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		HashCodeBuilder builder = new HashCodeBuilder();
+		builder.append(this.name);
+		builder.append(this.version);
+		return builder.toHashCode();
+	}
 }

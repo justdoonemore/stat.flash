@@ -19,6 +19,7 @@ package com.jdom.stat.flash.db;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
@@ -62,41 +63,73 @@ public class SqlDecksDaoTest {
 	}
 
 	@Test
-	public void createDeckAddsToDatabase() throws DaoException {
+	public void storeAddsToDatabase() throws DaoException {
 		Deck deck = new Deck("deck1");
-		dao.createDeck(deck);
-		List<Deck> decks = dao.getDecks();
+		dao.store(deck);
+		List<Deck> decks = dao.getAll();
 
 		assertThat(decks, hasSize(1));
 	}
 
 	@Test
-	public void createDeckSetsPrimaryKey() throws DaoException {
+	public void storeSetsPrimaryKey() throws DaoException {
 		Deck deck = new Deck("deck1");
-		dao.createDeck(deck);
-		List<Deck> decks = dao.getDecks();
+		dao.store(deck);
+		List<Deck> decks = dao.getAll();
 
 		assertThat(decks.iterator().next().getId(), is(not(DatabaseUtil.UNSET)));
 	}
 
 	@Test
-	public void createDeckAddsWithCorrectName() throws DaoException {
+	public void storeAddsWithCorrectName() throws DaoException {
 		Deck deck = new Deck("deck1");
-		dao.createDeck(deck);
-		List<Deck> decks = dao.getDecks();
+		dao.store(deck);
+		List<Deck> decks = dao.getAll();
 
 		assertThat(decks.iterator().next().getName(),
 				is(equalTo(deck.getName())));
 	}
 
 	@Test
-	public void createDeckAddsWithCorrectVersion() throws DaoException {
+	public void storeAddsWithCorrectVersion() throws DaoException {
 		Deck deck = new Deck("deck1");
-		dao.createDeck(deck);
-		List<Deck> decks = dao.getDecks();
+		dao.store(deck);
+		List<Deck> decks = dao.getAll();
 
 		assertThat(decks.iterator().next().getVersion(),
 				is(equalTo(deck.getVersion())));
 	}
 
+	@Test
+	public void getAllReturnsAllDecks() throws DaoException {
+		Deck deck1 = new Deck("deck1");
+		Deck deck2 = new Deck("deck2");
+		Deck deck3 = new Deck("deck3");
+
+		dao.store(deck1);
+		dao.store(deck2);
+		dao.store(deck3);
+
+		assertThat(dao.getAll(), contains(deck1, deck2, deck3));
+	}
+
+	@Test
+	public void deleteRemovesDeck() throws DaoException {
+		Deck deck1 = new Deck("deck1");
+		Deck deck2 = new Deck("deck2");
+		Deck deck3 = new Deck("deck3");
+
+		dao.store(deck1);
+		dao.store(deck2);
+		dao.store(deck3);
+
+		List<Deck> all = dao.getAll();
+		assertThat(all, hasSize(3));
+
+		dao.delete(deck2);
+
+		all = dao.getAll();
+		assertThat(all, hasSize(2));
+		assertThat(all, contains(deck1, deck3));
+	}
 }
